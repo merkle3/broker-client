@@ -9,29 +9,12 @@ message Transaction {
     string txBytes = 2;
 }
 
-message TransactionList {
-    repeated Transaction transactions = 1;
-    // name of the source
-    string source = 2;
-}
-
-// a ack message for the tx list
-message TxListAck {
-    string status = 1;
-}
-
 message TxStreamRequest {
     string name = 1;
 }
 
 // a service that accepts a list of transactions
 service BrokerApi {
-    // send transactions from receiver
-    rpc SendReceivedTransactions (TransactionList) returns (TxListAck) {}
-    // broadcast transactions from sender
-    rpc BroadcastTransactions (TransactionList) returns (TxListAck) {}
-
     // returns a stream of transactions
     rpc StreamReceivedTransactions (TxStreamRequest) returns (stream Transaction) {}
-    rpc StreamBroadcastTransactions (TxStreamRequest) returns (stream Transaction) {}
 }

@@ -22,13 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BrokerApiClient interface {
-	// send transactions from receiver
-	SendReceivedTransactions(ctx context.Context, in *TransactionList, opts ...grpc.CallOption) (*TxListAck, error)
-	// broadcast transactions from sender
-	BroadcastTransactions(ctx context.Context, in *TransactionList, opts ...grpc.CallOption) (*TxListAck, error)
 	// returns a stream of transactions
 	StreamReceivedTransactions(ctx context.Context, in *TxStreamRequest, opts ...grpc.CallOption) (BrokerApi_StreamReceivedTransactionsClient, error)
-	StreamBroadcastTransactions(ctx context.Context, in *TxStreamRequest, opts ...grpc.CallOption) (BrokerApi_StreamBroadcastTransactionsClient, error)
 }
 
 type brokerApiClient struct {
@@ -37,24 +32,6 @@ type brokerApiClient struct {
 
 func NewBrokerApiClient(cc grpc.ClientConnInterface) BrokerApiClient {
 	return &brokerApiClient{cc}
-}
-
-func (c *brokerApiClient) SendReceivedTransactions(ctx context.Context, in *TransactionList, opts ...grpc.CallOption) (*TxListAck, error) {
-	out := new(TxListAck)
-	err := c.cc.Invoke(ctx, "/usemerkle.com.broker.proto.BrokerApi/SendReceivedTransactions", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *brokerApiClient) BroadcastTransactions(ctx context.Context, in *TransactionList, opts ...grpc.CallOption) (*TxListAck, error) {
-	out := new(TxListAck)
-	err := c.cc.Invoke(ctx, "/usemerkle.com.broker.proto.BrokerApi/BroadcastTransactions", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *brokerApiClient) StreamReceivedTransactions(ctx context.Context, in *TxStreamRequest, opts ...grpc.CallOption) (BrokerApi_StreamReceivedTransactionsClient, error) {
@@ -89,49 +66,12 @@ func (x *brokerApiStreamReceivedTransactionsClient) Recv() (*Transaction, error)
 	return m, nil
 }
 
-func (c *brokerApiClient) StreamBroadcastTransactions(ctx context.Context, in *TxStreamRequest, opts ...grpc.CallOption) (BrokerApi_StreamBroadcastTransactionsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &BrokerApi_ServiceDesc.Streams[1], "/usemerkle.com.broker.proto.BrokerApi/StreamBroadcastTransactions", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &brokerApiStreamBroadcastTransactionsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type BrokerApi_StreamBroadcastTransactionsClient interface {
-	Recv() (*Transaction, error)
-	grpc.ClientStream
-}
-
-type brokerApiStreamBroadcastTransactionsClient struct {
-	grpc.ClientStream
-}
-
-func (x *brokerApiStreamBroadcastTransactionsClient) Recv() (*Transaction, error) {
-	m := new(Transaction)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // BrokerApiServer is the server API for BrokerApi service.
 // All implementations must embed UnimplementedBrokerApiServer
 // for forward compatibility
 type BrokerApiServer interface {
-	// send transactions from receiver
-	SendReceivedTransactions(context.Context, *TransactionList) (*TxListAck, error)
-	// broadcast transactions from sender
-	BroadcastTransactions(context.Context, *TransactionList) (*TxListAck, error)
 	// returns a stream of transactions
 	StreamReceivedTransactions(*TxStreamRequest, BrokerApi_StreamReceivedTransactionsServer) error
-	StreamBroadcastTransactions(*TxStreamRequest, BrokerApi_StreamBroadcastTransactionsServer) error
 	mustEmbedUnimplementedBrokerApiServer()
 }
 
@@ -139,17 +79,8 @@ type BrokerApiServer interface {
 type UnimplementedBrokerApiServer struct {
 }
 
-func (UnimplementedBrokerApiServer) SendReceivedTransactions(context.Context, *TransactionList) (*TxListAck, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendReceivedTransactions not implemented")
-}
-func (UnimplementedBrokerApiServer) BroadcastTransactions(context.Context, *TransactionList) (*TxListAck, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method BroadcastTransactions not implemented")
-}
 func (UnimplementedBrokerApiServer) StreamReceivedTransactions(*TxStreamRequest, BrokerApi_StreamReceivedTransactionsServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamReceivedTransactions not implemented")
-}
-func (UnimplementedBrokerApiServer) StreamBroadcastTransactions(*TxStreamRequest, BrokerApi_StreamBroadcastTransactionsServer) error {
-	return status.Errorf(codes.Unimplemented, "method StreamBroadcastTransactions not implemented")
 }
 func (UnimplementedBrokerApiServer) mustEmbedUnimplementedBrokerApiServer() {}
 
@@ -162,42 +93,6 @@ type UnsafeBrokerApiServer interface {
 
 func RegisterBrokerApiServer(s grpc.ServiceRegistrar, srv BrokerApiServer) {
 	s.RegisterService(&BrokerApi_ServiceDesc, srv)
-}
-
-func _BrokerApi_SendReceivedTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TransactionList)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerApiServer).SendReceivedTransactions(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/usemerkle.com.broker.proto.BrokerApi/SendReceivedTransactions",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerApiServer).SendReceivedTransactions(ctx, req.(*TransactionList))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BrokerApi_BroadcastTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TransactionList)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerApiServer).BroadcastTransactions(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/usemerkle.com.broker.proto.BrokerApi/BroadcastTransactions",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerApiServer).BroadcastTransactions(ctx, req.(*TransactionList))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _BrokerApi_StreamReceivedTransactions_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -221,52 +116,17 @@ func (x *brokerApiStreamReceivedTransactionsServer) Send(m *Transaction) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _BrokerApi_StreamBroadcastTransactions_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(TxStreamRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(BrokerApiServer).StreamBroadcastTransactions(m, &brokerApiStreamBroadcastTransactionsServer{stream})
-}
-
-type BrokerApi_StreamBroadcastTransactionsServer interface {
-	Send(*Transaction) error
-	grpc.ServerStream
-}
-
-type brokerApiStreamBroadcastTransactionsServer struct {
-	grpc.ServerStream
-}
-
-func (x *brokerApiStreamBroadcastTransactionsServer) Send(m *Transaction) error {
-	return x.ServerStream.SendMsg(m)
-}
-
 // BrokerApi_ServiceDesc is the grpc.ServiceDesc for BrokerApi service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BrokerApi_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "usemerkle.com.broker.proto.BrokerApi",
 	HandlerType: (*BrokerApiServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "SendReceivedTransactions",
-			Handler:    _BrokerApi_SendReceivedTransactions_Handler,
-		},
-		{
-			MethodName: "BroadcastTransactions",
-			Handler:    _BrokerApi_BroadcastTransactions_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamReceivedTransactions",
 			Handler:       _BrokerApi_StreamReceivedTransactions_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "StreamBroadcastTransactions",
-			Handler:       _BrokerApi_StreamBroadcastTransactions_Handler,
 			ServerStreams: true,
 		},
 	},
