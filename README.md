@@ -10,7 +10,7 @@ On average, our network gets a block coverage of ~98% and catches transactions 6
 
 ## How it works
 
-The merkle transaction broker is a gRPC service running at 
+The Merkle transaction broker is a gRPC service running at 
 
 ```
 https://txs.usemerkle.com
