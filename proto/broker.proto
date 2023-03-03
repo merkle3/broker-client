@@ -10,7 +10,7 @@ message Transaction {
 }
 
 message TxStreamRequest {
-    string name = 1;
+    string api_key = 1;
 }
 
 // a service that accepts a list of transactions
