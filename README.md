@@ -19,3 +19,12 @@ https://txs.usemerkle.com
 To test it, clone this repo and run `make listen`. Checkout [the example on how to listen for transactions](cmd/test/main.go).
 
 **Merkle transations is free while in beta, pricing will be announced soon. Beta users will get preferred pricing.**
+
+## Installation
+
+Install the Merkle broker client package:
+
+```
+go get github.com/merkle3/broker-client
+```
+
