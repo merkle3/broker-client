@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	"github.com/merkle3/broker-client/proto"
 	log "github.com/sirupsen/logrus"
@@ -23,12 +24,16 @@ func main() {
 
 	log.Info("connected to broker")
 
+	chainId := int32(1)
+
 	stream, err := broker.StreamReceivedTransactions(context.Background(), &proto.TxStreamRequest{
 		ApiKey:  "0x0000000000000000000000000000000000000000", // not required while in beta, please use your ethereum address in the meantime
-		ChainId: 1,                                            // optional, defaults to 1 (mainnet)
+		ChainId: chainId,                                      // optional, defaults to 1 (mainnet)
 	})
 
-	log.Info("connected to tx stream")
+	log.WithFields(log.Fields{
+		"chainId": chainId,
+	}).Info("connected to tx stream")
 
 	if err != nil {
 		log.WithError(err).Fatal("error connecting to tx stream")
@@ -48,6 +53,9 @@ func main() {
 			continue
 		}
 
-		log.Info(tx.Hash().String())
+		log.WithFields(log.Fields{
+			"timestamp": time.Now(),
+			"chainId":   tx.ChainId().Uint64(),
+		}).Info(tx.Hash().String())
 	}
 }
