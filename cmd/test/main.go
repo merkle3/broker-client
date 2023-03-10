@@ -24,7 +24,8 @@ func main() {
 	log.Info("connected to broker")
 
 	stream, err := broker.StreamReceivedTransactions(context.Background(), &proto.TxStreamRequest{
-		ApiKey: "0x0000000000000000000000000000000000000000", // not required while in beta, please use your ethereum address in the meantime
+		ApiKey:  "0x0000000000000000000000000000000000000000", // not required while in beta, please use your ethereum address in the meantime
+		ChainId: 1,                                            // optional, defaults to 1 (mainnet)
 	})
 
 	log.Info("connected to tx stream")

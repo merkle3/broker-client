@@ -11,6 +11,7 @@ message Transaction {
 
 message TxStreamRequest {
     string api_key = 1;
+    int32 chain_id = 2;
 }
 
 // a service that accepts a list of transactions
