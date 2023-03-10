@@ -55,6 +55,7 @@ func main() {
 
 		log.WithFields(log.Fields{
 			"timestamp": time.Now(),
+			"lag_ms":    time.Now().UnixMilli() - txPacket.ArrivalTime,
 			"chainId":   tx.ChainId().Uint64(),
 		}).Info(tx.Hash().String())
 	}
