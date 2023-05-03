@@ -4,27 +4,7 @@
 
 # Merkle transactions
 
-Merkle transactions is a service that streams transactions harvested by Merkle's private transaction network. We run a fleet of nodes listening to transactions on Ethereum mainnet.
+THIS REPOSITORY IS DEPRECATED, PLEASE USE OUR SDKS:
 
-On average, our network gets a block coverage of ~98% and catches transactions 6 seconds before they are mined. All transactions are guaranteed to be valid, no duplicates, no low nonces, no wrong chain id.
-
-## How it works
-
-The Merkle transaction broker is a gRPC service running at 
-
-```
-https://txs.usemerkle.com
-```
-
-To test it, clone this repo and run `make listen`. Checkout [the example on how to listen for transactions](cmd/test/main.go).
-
-**Merkle transations is free while in beta, pricing will be announced soon. Beta users will get preferred pricing.**
-
-## Installation
-
-Install the Merkle broker client package:
-
-```
-go get github.com/merkle3/broker-client
-```
-
+- For Golang: https://github.com/merkle3/merkle-sdk-go
+- For Javascript: https://github.com/merkle3/merkle-sdk-ts
